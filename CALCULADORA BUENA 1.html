@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora Ambiental</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Encode+Sans+Semi+Condensed:wght@600&family=Spartan:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* Estilo general */
+        body {
+            font-family: 'Spartan', sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            background-color: black;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: black;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Fondo de video */
+        .video-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.4;
+            z-index: -1;
+        }
+
+        /* Contenedor principal */
+        .container {
+            max-width: 500px;
+            width: 90%;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+            z-index: 1;
+            backdrop-filter: blur(5px);
+        }
+
+        /* Logo */
+        .logo {
+            width: 150px;
+            margin-bottom: 10px;
+        }
+
+        /* Títulos */
+        h2 {
+            font-family: 'Encode Sans Semi Condensed', sans-serif;
+            color: #39A935;
+            font-size: 26px;
+            margin-bottom: 15px;
+        }
+
+        /* Entradas y botones */
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: none;
+            font-size: 16px;
+        }
+
+        input {
+            border: 1px solid #ccc;
+        }
+
+        button {
+            background-color: #009192;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background-color: #1D1D1B;
+        }
+
+        /* Sección de resultados */
+        .columns {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
+        .column {
+            flex: 1;
+            margin: 10px;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 14px;
+            color: black; /* Texto en negro */
+        }
+
+        .impact-column {
+            background-color: #39A935; /* Verde sólido */
+            color: black;
+        }
+
+        .cost-column {
+            background-color: #009192; /* Azul sólido */
+            color: black;
+        }
+
+        /* Resaltado */
+        .highlight {
+            font-size: 18px;
+            font-weight: bold;
+            color: black;
+        }
+
+        /* Ocultar la sección de resultados al inicio */
+        #resultado {
+            display: none;
+        }
+
+        /* Botón de volver a calcular */
+        #volverBtn {
+            display: none;
+            background-color: #1D1D1B;
+        }
+
+        @media (max-width: 768px) {
+            .columns {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .column {
+                width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Video de fondo -->
+    <div class="video-background">
+    <iframe src="https://player.vimeo.com/video/1067408867?h=374b8f1b30&amp;autoplay=1&amp;loop=1&amp;muted=1&amp;background=1" 
+        frameborder="0" allow="autoplay; fullscreen; picture-in-picture" 
+        style="width:100%; height:100%;" allowfullscreen>
+    </iframe>
+</div>
+
+    <div class="container">
+       <img src="https://i.imgur.com/VPJ7xEK.png" class="logo" alt="Logo Grün">
+        <h2>Calculadora Ambiental</h2>
+        
+        <!-- Sección de entrada -->
+        <div id="entrada">
+            <label for="residuos">Toneladas de residuos generadas al día:</label>
+            <input type="number" id="residuos" placeholder="Ingrese las toneladas">
+            <button id="calcularBtn" onclick="calcularImpacto()">Calcular Impacto</button>
+        </div>
+
+        <!-- Sección de resultados -->
+        <div id="resultado"></div>
+
+        <button id="volverBtn" onclick="volverACalcular()">Volver a Calcular</button>
+    </div>
+
+    <script>
+        function calcularImpacto() {
+            let residuos = parseFloat(document.getElementById('residuos').value);
+            
+            if (isNaN(residuos) || residuos <= 0) {
+                document.getElementById('resultado').innerHTML = "<p class='highlight'>Por favor, ingrese una cantidad válida.</p>";
+                return;
+            }
+
+            let metanoGenerado = residuos * 0.25;
+            let impactoCO2 = metanoGenerado * 27;
+            let costoDisposicion = residuos * 200;
+            let perdidaReciclables = residuos * 0.3 * 4500;
+            let perdidaAnual = (costoDisposicion + perdidaReciclables) * 365;
+
+            document.getElementById('resultado').innerHTML = `
+                <p class="highlight">Generando ${residuos.toFixed(2)} toneladas de residuos al día</p>
+                <div class="columns">
+                    <div class="column impact-column">
+                        <h3>Impacto Ambiental</h3>
+                        <p>Metano generado: <span class="highlight">${metanoGenerado.toFixed(2)} toneladas/día</span></p>
+                        <p>Impacto CO₂ equivalente: <span class="highlight">${impactoCO2.toFixed(2)} toneladas CO₂-eq/día</span></p>
+                    </div>
+                    <div class="column cost-column">
+                        <h3>Costo Económico</h3>
+                        <p>Costo por relleno sanitario: <span class="highlight">$${costoDisposicion.toLocaleString()} MXN/día</span></p>
+                        <p>Pérdida por reciclables: <span class="highlight">$${perdidaReciclables.toLocaleString()} MXN/día</span></p>
+                        <p>Pérdida total anual: <span class="highlight">$${perdidaAnual.toLocaleString()} MXN/año</span></p>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('entrada').style.display = "none";
+            document.getElementById('resultado').style.display = "block";
+            document.getElementById('volverBtn').style.display = "block";
+        }
+
+        function volverACalcular() {
+            document.getElementById('entrada').style.display = "block"; 
+            document.getElementById('resultado').style.display = "none"; 
+            document.getElementById('volverBtn').style.display = "none"; 
+            document.getElementById('residuos').value = "";
+        }
+    </script>
+</body>
+</html>
